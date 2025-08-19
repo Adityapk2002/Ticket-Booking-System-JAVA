@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.example.entities.User;
+import org.example.util.UserServiceUtil;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,8 +26,29 @@ public class UserBookingService {
         });
     }
 
-    // public Boolean loginUser() {
+    public Boolean loginUser() {
+        Optional<User> foundUser = userList.stream().filter(user1 -> {
+            return user1.getName().equals(user.getName())
+                    && UserServiceUtil.checkPassword(user.getPassword(), user1.getHashedPassword());
+        }).findFirst();
+        return foundUser.isPresent();
+    };
+    // here we use optional because if we don't get any user we will not get null
+    // pointer exception
 
-    // }
+    public Boolean signUp(User user1) {
+        try {
+            userList.add(user1);
+            saveUserListToFile();
+            return Boolean.TRUE;
+        } catch (IOException ex) {
+            return Boolean.FALSE;
+        }
+    }
+
+    private void saveUserListToFile() throws IOException {
+        File userFile = new File(USERS_PATH);
+        objectMapper.writeValue(userFile, userList);
+    }
 
 }
