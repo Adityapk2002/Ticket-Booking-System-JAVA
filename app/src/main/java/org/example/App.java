@@ -25,7 +25,7 @@ public class App {
         try {
             userBookingService = new UserBookingService();
         } catch (IOException ex) {
-            System.out.println("There is something wrong");
+            System.out.println("There is something wrong: " + ex.getMessage());
             return;
         }
         while (option != 7) {
@@ -38,6 +38,10 @@ public class App {
             System.out.println("6. Cancel my Booking");
             System.out.println("7. Exit the App");
 
+            if (!scanner.hasNextInt()) {
+                System.out.println("Please enter a number from 1 to 7");
+                break;
+            }
             option = scanner.nextInt();
             Train trainSelectedForBooking = new Train();
 
@@ -66,10 +70,10 @@ public class App {
                     try {
                         userBookingService = new UserBookingService(userToLogin);
                     } catch (IOException ex) {
-                        System.out.println("There is something wrong");
+                        System.out.println("There is something wrong: " + ex.getMessage());
                         return;
                     }
-                    ;
+                    break;
 
                 case 3:
                     userBookingService.fetchBookings();
@@ -83,13 +87,23 @@ public class App {
                     List<Train> trains = userBookingService.getTrains(source, destination);
                     int index = 1;
                     for (Train t : trains) {
-                        System.out.println(index + "TrainId : " + t.getTrainId());
+                        System.out.println(index + ") TrainId : " + t.getTrainId());
                         for (Map.Entry<String, String> entry : t.getStationTimes().entrySet()) {
                             System.out.println("Station " + entry.getKey() + " time: " + entry.getValue());
                         }
+                        index++;
                     }
                     System.out.println("Select a train by typing 1,2,3....");
-                    trainSelectedForBooking = trains.get(scanner.nextInt());
+                    if (!scanner.hasNextInt()) {
+                        System.out.println("Invalid selection");
+                        break;
+                    }
+                    int selected = scanner.nextInt();
+                    if (selected < 1 || selected > trains.size()) {
+                        System.out.println("Invalid selection");
+                        break;
+                    }
+                    trainSelectedForBooking = trains.get(selected - 1);
                     break;
 
                 case 5:
@@ -103,8 +117,16 @@ public class App {
                     }
                     System.out.println("Select the seat by typing the row and column");
                     System.out.println("Enter the row");
+                    if (!scanner.hasNextInt()) {
+                        System.out.println("Invalid row");
+                        break;
+                    }
                     int row = scanner.nextInt();
                     System.out.println("Enter the column");
+                    if (!scanner.hasNextInt()) {
+                        System.out.println("Invalid column");
+                        break;
+                    }
                     int col = scanner.nextInt();
                     System.out.println("Booking your seat....");
                     Boolean booked = userBookingService.bookTrainSeat(trainSelectedForBooking, row, col);

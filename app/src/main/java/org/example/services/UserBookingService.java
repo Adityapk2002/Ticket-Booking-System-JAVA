@@ -13,12 +13,16 @@ import org.example.util.UserServiceUtil;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 
 public class UserBookingService {
 
     private User user;
     private List<User> userList;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper()
+            .setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     private static final String USERS_PATH = "app/src/main/java/org/example/localDb/users.json";
 
     // type reference is used to deseralize
@@ -33,8 +37,13 @@ public class UserBookingService {
 
     public List<User> loadUsers() throws IOException { // this function will load all users from localDb
         File users = new File(USERS_PATH);
-        return objectMapper.readValue(users, new TypeReference<List<User>>() {
+        if (!users.exists() || users.length() == 0) {
+            this.userList = new ArrayList<>();
+            return this.userList;
+        }
+        this.userList = objectMapper.readValue(users, new TypeReference<List<User>>() {
         });
+        return this.userList;
     }
 
     public Boolean loginUser() {

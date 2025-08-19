@@ -36,3 +36,8 @@ application {
     // Define the main class for the application.
     mainClass = 'org.example.App'
 }
+
+// Forward stdin to the application so Scanner(System.in) works with interactive and piped input
+tasks.named('run') {
+    standardInput = System.in
+}

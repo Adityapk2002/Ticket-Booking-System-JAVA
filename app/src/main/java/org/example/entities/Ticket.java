@@ -1,9 +1,12 @@
 package org.example.entities;
 
 import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Ticket {
+    @JsonProperty("ticket_id")
     private String ticketId;
+    @JsonProperty("user_id")
     private String userId;
     private User user;
     private Integer seatNo;
@@ -66,7 +69,7 @@ public class Ticket {
     }
 
     public String getTicketInfo() {
-        return String.format("Ticket ID : %s belomgs to User %s from %s to %s on %s", ticketId, userId, source,
+        return String.format("Ticket ID: %s belongs to User %s from %s to %s on %s", ticketId, userId, source,
                 destination, dateOfTravel);
     }
 }
