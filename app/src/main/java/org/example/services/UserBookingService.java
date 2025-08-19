@@ -27,6 +27,13 @@ public class UserBookingService {
         });
     }
 
+    public UserBookingService() throws IOException {
+        File users = new File(USERS_PATH);
+        userList = objectMapper.readValue(users, new TypeReference<List<User>>() {
+        });
+
+    }
+
     public Boolean loginUser() {
         Optional<User> foundUser = userList.stream().filter(user1 -> {
             return user1.getName().equals(user.getName())
@@ -62,27 +69,25 @@ public class UserBookingService {
         }
     }
 
-    public boolean cancelBooking(String ticketId) {
-        Scanner s = new Scanner(System.in);
-        System.out.println("Enter your TicketID to cancel");
-        ticketId = s.next();
+    public boolean cancelBooking() {
+        try (Scanner s = new Scanner(System.in)) {
+            System.out.println("Enter your TicketID to cancel:");
+            String ticketId = s.next();
 
-        if (ticketId == null || ticketId.isEmpty()) {
-            System.out.println("TicketId can not be empty or null");
-            return Boolean.FALSE;
-        }
+            if (ticketId == null || ticketId.isEmpty()) {
+                System.out.println("TicketId cannot be empty or null");
+                return false;
+            }
 
-        String finalTicketId1 = ticketId;
-        boolean removed = user.getTicketBooked().removeIf(ticket -> ticket.getTicketId().equals(finalTicketId1));
+            boolean removed = user.getTicketBooked().removeIf(ticket -> ticket.getTicketId().equals(ticketId));
 
-        String finalTicketId = ticketId;
-        user.getTicketBooked().removeIf(ticket -> ticket.getTicketId().equals(finalTicketId));
-        if (removed) {
-            System.out.println("Ticket with ID :" + ticketId + "has been canceled");
-            return Boolean.TRUE;
-        } else {
-            System.out.println("No Ticket found with : " + ticketId);
-            return Boolean.FALSE;
+            if (removed) {
+                System.out.println("Ticket with ID: " + ticketId + " has been canceled");
+                return true;
+            } else {
+                System.out.println("No ticket found with ID: " + ticketId);
+                return false;
+            }
         }
     }
 
