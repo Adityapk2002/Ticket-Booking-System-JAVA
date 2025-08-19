@@ -22,16 +22,17 @@ public class UserBookingService {
     // type reference is used to deseralize
     public UserBookingService(User user1) throws IOException {
         this.user = user1;
-        File users = new File(USERS_PATH);
-        userList = objectMapper.readValue(users, new TypeReference<List<User>>() {
-        });
+        loadUsers();
     }
 
     public UserBookingService() throws IOException {
-        File users = new File(USERS_PATH);
-        userList = objectMapper.readValue(users, new TypeReference<List<User>>() {
-        });
+        loadUsers();
+    }
 
+    public List<User> loadUsers() throws IOException { // this function will load all users from localDb
+        File users = new File(USERS_PATH);
+        return objectMapper.readValue(users, new TypeReference<List<User>>() {
+        });
     }
 
     public Boolean loginUser() {
@@ -89,6 +90,10 @@ public class UserBookingService {
                 return false;
             }
         }
+    }
+
+    public List<Train> geTrains(String source, String destination) {
+        return TrainService.searchTrains(source, destination);
     }
 
 }
