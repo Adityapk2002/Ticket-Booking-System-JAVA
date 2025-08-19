@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
+import org.example.entities.Train;
 import org.example.entities.User;
 import org.example.services.UserBookingService;
 import org.example.util.UserServiceUtil;
@@ -75,6 +76,10 @@ public class App {
                     System.out.println("Type your destination station");
                     String destination = scanner.next();
                     List<Train> trains = userBookingService.getTrains(source, destination);
+                    int index = 1;
+                    for (Train t : trains) {
+                        System.out.println(index + "TrainId : " + getTrainId());
+                    }
                     break;
                 case 5:
                     break;

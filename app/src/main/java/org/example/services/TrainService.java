@@ -1,16 +1,17 @@
 package org.example.services;
 
+import java.util.ArrayList;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.example.entities.Train;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TrainService {
@@ -18,6 +19,18 @@ public class TrainService {
     private List<Train> trainList;
     private ObjectMapper objectMapper = new ObjectMapper();
     private static final String TRAINS_PATH = "app/src/main/java/org/example/localDb/trains.json";
+
+    public TrainService() throws IOException {
+        this.trainList = loadTrains();
+    }
+
+    private List<Train> loadTrains() throws IOException {
+        File trainsFile = new File(TRAINS_PATH);
+        if (!trainsFile.exists() || trainsFile.length() == 0)
+            return new ArrayList<>();
+        return objectMapper.readValue(trainsFile, new TypeReference<List<Train>>() {
+        });
+    }
 
     public List<Train> searchTrains(String source, String destination) {
         return trainList.stream().filter(train -> validTrain(train, source, destination)).collect(Collectors.toList());
@@ -60,7 +73,10 @@ public class TrainService {
     }
 
     private boolean validTrain(Train train, String source, String destination) {
-        List<String> stationOrder = train.getStations();
+        // Convert station list to lowercase for case-insensitive comparison
+        List<String> stationOrder = train.getStations().stream()
+                .map(String::toLowerCase)
+                .collect(Collectors.toList());
 
         int sourceIndex = stationOrder.indexOf(source.toLowerCase());
         int destinationIndex = stationOrder.indexOf(destination.toLowerCase());
